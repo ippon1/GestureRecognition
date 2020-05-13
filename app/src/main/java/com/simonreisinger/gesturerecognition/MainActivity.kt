@@ -4,18 +4,16 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.SurfaceView
+import android.view.View
 import android.view.WindowManager
-import org.opencv.android.BaseLoaderCallback
-import org.opencv.android.CameraBridgeViewBase
+import org.opencv.android.*
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2
-import org.opencv.android.LoaderCallbackInterface
-import org.opencv.android.OpenCVLoader
-import org.opencv.android.CameraActivity
 import org.opencv.core.Mat
+import java.util.*
 
 
-class Tutorial1Activity :  CameraActivity(), CvCameraViewListener2 { //
+class MainActivity : CameraActivity(), CvCameraViewListener2 {
     private var mOpenCvCameraView: CameraBridgeViewBase? = null
     private val mIsJavaCamera = true
     private val mItemSwitchCamera: MenuItem? = null
@@ -37,23 +35,23 @@ class Tutorial1Activity :  CameraActivity(), CvCameraViewListener2 { //
     }
 
     /** Called when the activity is first created.  */
-    fun onCreate(savedInstanceState: Bundle?) {
+    public override fun onCreate(savedInstanceState: Bundle?) {
         Log.i(TAG, "called onCreate")
         super.onCreate(savedInstanceState)
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        setContentView(R.layout.tutorial1_surface_view)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        setContentView(R.layout.activity_main)
         mOpenCvCameraView =
-            findViewById(R.id.tutorial1_activity_java_surface_view) as CameraBridgeViewBase?
+            findViewById<View>(R.id.surface_view) as CameraBridgeViewBase
         mOpenCvCameraView!!.visibility = SurfaceView.VISIBLE
         mOpenCvCameraView!!.setCvCameraViewListener(this)
     }
 
-    fun onPause() {
+    public override fun onPause() {
         super.onPause()
         if (mOpenCvCameraView != null) mOpenCvCameraView!!.disableView()
     }
 
-    fun onResume() {
+    public override fun onResume() {
         super.onResume()
         if (!OpenCVLoader.initDebug()) {
             Log.d(
@@ -70,10 +68,11 @@ class Tutorial1Activity :  CameraActivity(), CvCameraViewListener2 { //
         }
     }
 
-    protected val cameraViewList: List<CameraBridgeViewBase>
-        protected get() = listOf(mOpenCvCameraView)
+    override fun getCameraViewList(): List<CameraBridgeViewBase?>? {
+        return Collections.singletonList(mOpenCvCameraView)
+    }
 
-    fun onDestroy() {
+    public override fun onDestroy() {
         super.onDestroy()
         if (mOpenCvCameraView != null) mOpenCvCameraView!!.disableView()
     }
