@@ -1,0 +1,3 @@
+rootProject.name='GestureRecognition'
+include ':app'
+include ':openCVLibrary2411'
