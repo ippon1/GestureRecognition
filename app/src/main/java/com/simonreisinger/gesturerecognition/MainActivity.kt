@@ -1,11 +1,16 @@
 package com.simonreisinger.gesturerecognition
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.graphics.Camera
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.*
 import android.view.View.OnTouchListener
+import android.widget.Button
+import android.widget.Toast
 import org.opencv.android.BaseLoaderCallback
 import org.opencv.android.CameraBridgeViewBase
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame
@@ -16,9 +21,12 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.Scalar
 import org.opencv.core.Size
+import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
-import android.widget.Button;
-
+import java.io.FileOutputStream
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     private var mIsColorSelected = false
@@ -60,7 +68,13 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
 
         val buttonClick: Button = findViewById(R.id.playButton) as Button
         buttonClick.setOnClickListener {
-                buttonClick.setBackgroundColor(Color.BLUE)
+            buttonClick.setBackgroundColor(Color.BLUE)
+            val sdf = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
+            val currentDateandTime: String = sdf.format(Date())
+            val fileName: String =
+                Environment.getExternalStorageDirectory().getPath().toString() + "/TODO_" + currentDateandTime + ".jpg"
+            Toast.makeText(this, "$fileName saved", Toast.LENGTH_SHORT).show()
+            Imgcodecs.imwrite(fileName, mRgba)
         }
     }
 
@@ -98,15 +112,19 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     }
 
     override fun onCameraViewStopped() {
-        mRgba!!.release()
+        if (mRgba != null) {
+            mRgba!!.release()
+        }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(v: View?, event: MotionEvent): Boolean {
         return false // don't need subsequent touch events
     }
 
     override fun onCameraFrame(inputFrame: CvCameraViewFrame): Mat? {
-        mRgba = inputFrame.rgba()
+        mRgba = inputFrame.gray(); //.rgba()
+
         return mRgba
     }
 
@@ -124,4 +142,5 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     init {
         Log.i(TAG, "Instantiated new " + this.javaClass)
     }
+
 }
