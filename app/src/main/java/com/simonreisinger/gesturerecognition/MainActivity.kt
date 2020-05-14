@@ -93,6 +93,7 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     }
 
     override fun onTouch(v: View?, event: MotionEvent): Boolean {
+        /*
         val cols = mRgba!!.cols()
         val rows = mRgba!!.rows()
         val xOffset = (mOpenCvCameraView!!.width - cols) / 2
@@ -114,9 +115,13 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
         mBlobColorHsv = Core.sumElems(touchedRegionHsv)
         val pointCount: Int = touchedRect.width * touchedRect.height
         if (mBlobColorHsv != null) {
-            for (i in mBlobColorHsv!!.`val`.indices) {
-                mBlobColorHsv!!.`val`[i] /= pointCount
-            }
+            //for (i in mBlobColorHsv!!.`val`.indices) {
+            //    mBlobColorHsv!!.`val`[i] /= pointCount
+            //}
+
+            for (item in mBlobColorHsv!!.`val`)
+                item /= pointCount
+
 
             mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv)
             Log.i(
@@ -137,14 +142,15 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
             touchedRegionRgba.release()
             touchedRegionHsv.release()
         }
+        */
         return false // don't need subsequent touch events
     }
 
     override fun onCameraFrame(inputFrame: CvCameraViewFrame): Mat? {
         mRgba = inputFrame.rgba()
-        if (mRgba != null && mIsColorSelected) {
+        if (mDetector != null && mRgba != null && mIsColorSelected) {
             mDetector?.process(mRgba)
-            val contours: List<MatOfPoint> = mDetector.mContours
+            val contours: List<MatOfPoint> = mDetector!!.mContours
             Log.e(TAG, "Contours count: " + contours.size)
             Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR)
             val colorLabel = mRgba!!.submat(4, 68, 4, 68)
