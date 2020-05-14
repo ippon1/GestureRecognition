@@ -2,7 +2,6 @@ package com.simonreisinger.gesturerecognition
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.graphics.Camera
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
@@ -23,10 +22,9 @@ import org.opencv.core.Scalar
 import org.opencv.core.Size
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
-import java.io.FileOutputStream
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     private var mIsColorSelected = false
@@ -124,8 +122,12 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
 
     override fun onCameraFrame(inputFrame: CvCameraViewFrame): Mat? {
         mRgba = inputFrame.gray(); //.rgba()
+        val im = Mat()
+        // https://stackoverflow.com/questions/22240220/thresholding-image-in-opencv-for-a-range-of-max-and-min-values
+        Imgproc.threshold(mRgba, im,100.0,150.0,Imgproc.THRESH_BINARY);
 
-        return mRgba
+
+        return im
     }
 
     private fun converScalarHsv2Rgba(hsvColor: Scalar?): Scalar {
