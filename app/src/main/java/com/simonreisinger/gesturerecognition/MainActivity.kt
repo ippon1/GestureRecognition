@@ -1,6 +1,7 @@
 package com.simonreisinger.gesturerecognition
 
 import android.app.Activity
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -11,8 +12,12 @@ import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2
 import org.opencv.android.LoaderCallbackInterface
 import org.opencv.android.OpenCVLoader
-import org.opencv.core.*
+import org.opencv.core.CvType
+import org.opencv.core.Mat
+import org.opencv.core.Scalar
+import org.opencv.core.Size
 import org.opencv.imgproc.Imgproc
+import android.widget.Button;
 
 
 class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
@@ -51,6 +56,12 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
             findViewById(R.id.color_blob_detection_activity_surface_view) as CameraBridgeViewBase?
         mOpenCvCameraView!!.visibility = SurfaceView.VISIBLE
         mOpenCvCameraView!!.setCvCameraViewListener(this)
+
+
+        val buttonClick: Button = findViewById(R.id.playButton) as Button
+        buttonClick.setOnClickListener {
+                buttonClick.setBackgroundColor(Color.BLUE)
+        }
     }
 
     override fun onPause() {

@@ -5,8 +5,22 @@
     android:layout_height="match_parent" >
 
     <org.opencv.android.JavaCameraView
+        android:id="@+id/color_blob_detection_activity_surface_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/color_blob_detection_activity_surface_view" />
+        android:layout_height="212dp"
+        android:padding="300dp"
+        android:paddingStart="300dp"
+        android:paddingLeft="300dp"
+        android:paddingTop="300dp"
+        android:paddingEnd="300dp"
+        android:paddingRight="300dp" />
+
+
+    <Button
+        android:id="@+id/playButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/action" />
+
 
 </FrameLayout>

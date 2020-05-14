@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GestureRecognition</string>
+    <string name="action">action</string>
 </resources>
