@@ -10,3 +10,6 @@
 openCVLibrary2411/build/intermediates/runtime_library_classes/debug/classes.jar
 *.class
 *.class
+/captures
+.externalNativeBuild
+.cxx
