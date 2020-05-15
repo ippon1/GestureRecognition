@@ -2,6 +2,7 @@ package com.simonreisinger.gesturerecognition
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
@@ -10,23 +11,20 @@ import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.Button
 import android.widget.Toast
-import org.opencv.android.BaseLoaderCallback
-import org.opencv.android.CameraBridgeViewBase
+import org.opencv.android.*
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2
-import org.opencv.android.LoaderCallbackInterface
-import org.opencv.android.OpenCVLoader
-import org.opencv.core.CvType
-import org.opencv.core.Mat
-import org.opencv.core.Scalar
-import org.opencv.core.Size
+import org.opencv.core.*
 import org.opencv.imgcodecs.Imgcodecs
+import org.opencv.imgcodecs.Imgcodecs.IMREAD_COLOR
+import org.opencv.imgcodecs.Imgcodecs.imread
 import org.opencv.imgproc.Imgproc
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
+open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
+    private var utilities: Utilities = Utilities()
     private var mIsColorSelected = false
     private var mRgba: Mat? = null
     private var mBlobColorRgba: Scalar? = null
@@ -66,11 +64,13 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
 
         val buttonClick: Button = findViewById(R.id.playButton) as Button
         buttonClick.setOnClickListener {
+            utilities.opening_images("/sdcard/DCIM/depth.png")
             buttonClick.setBackgroundColor(Color.BLUE)
             val sdf = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
             val currentDateandTime: String = sdf.format(Date())
             val fileName: String =
-                Environment.getExternalStorageDirectory().getPath().toString() + "/TODO_" + currentDateandTime + ".jpg"
+                Environment.getExternalStorageDirectory().getPath()
+                    .toString() + "/TODO_" + currentDateandTime + ".jpg"
             Toast.makeText(this, "$fileName saved", Toast.LENGTH_SHORT).show()
             Imgcodecs.imwrite(fileName, mRgba)
         }
@@ -124,17 +124,10 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
         mRgba = inputFrame.gray(); //.rgba()
         val im = Mat()
         // https://stackoverflow.com/questions/22240220/thresholding-image-in-opencv-for-a-range-of-max-and-min-values
-        Imgproc.threshold(mRgba, im,100.0,150.0,Imgproc.THRESH_BINARY);
+        Imgproc.threshold(mRgba, im, 100.0, 150.0, Imgproc.THRESH_BINARY);
 
 
         return im
-    }
-
-    private fun converScalarHsv2Rgba(hsvColor: Scalar?): Scalar {
-        val pointMatRgba = Mat()
-        val pointMatHsv = Mat(1, 1, CvType.CV_8UC3, hsvColor)
-        Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4)
-        return Scalar(pointMatRgba[0, 0])
     }
 
     companion object {
@@ -144,5 +137,4 @@ class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     init {
         Log.i(TAG, "Instantiated new " + this.javaClass)
     }
-
 }
