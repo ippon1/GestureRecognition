@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import org.opencv.android.*
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame
@@ -61,10 +62,10 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
         mOpenCvCameraView!!.visibility = SurfaceView.VISIBLE
         mOpenCvCameraView!!.setCvCameraViewListener(this)
 
-
-        val buttonClick: Button = findViewById(R.id.playButton) as Button
+        val buttonClick: Button = findViewById<Button>(R.id.playButton)
         buttonClick.setOnClickListener {
-            utilities.opening_images("/sdcard/DCIM/depth.png")
+            val imgMat = utilities.opening_images("/sdcard/DCIM/depth.png")
+            utilities.MatToImgView(imgMat, findViewById<ImageView>(R.id.imgView))
             buttonClick.setBackgroundColor(Color.BLUE)
             val sdf = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
             val currentDateandTime: String = sdf.format(Date())
