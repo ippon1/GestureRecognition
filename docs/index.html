@@ -12,11 +12,11 @@
 
 <script>
     function bin2dec(num){
-      return parseInt(num, 2);
+      return parseInt(num, 2).toSting();
     }
 
     function ax(fingerString){
-        document.getElementById("demo").innerHTML = bin2dec(fingerString).toSting()
+        document.getElementById("demo").innerHTML = bin2dec(fingerString)
     }
 </script>
 </body>
