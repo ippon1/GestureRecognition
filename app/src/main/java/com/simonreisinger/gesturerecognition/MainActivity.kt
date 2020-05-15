@@ -26,6 +26,7 @@ import java.util.*
 
 open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     private var utilities: Utilities = Utilities()
+    private var findHand: FindHand = FindHand()
     private var mIsColorSelected = false
     private var mRgba: Mat? = null
     private var mBlobColorRgba: Scalar? = null
@@ -64,16 +65,16 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
 
         val buttonClick: Button = findViewById<Button>(R.id.playButton)
         buttonClick.setOnClickListener {
-            val imgMat = utilities.opening_images("/sdcard/DCIM/depth.png")
-            utilities.MatToImgView(imgMat, findViewById<ImageView>(R.id.imgView))
             buttonClick.setBackgroundColor(Color.BLUE)
+
+            val imgMat = utilities.openingImages("/sdcard/DCIM/depth.png")
+
+            utilities.MatToImgView(imgMat, findViewById<ImageView>(R.id.imgView))
+
             val sdf = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
             val currentDateandTime: String = sdf.format(Date())
-            val fileName: String =
-                Environment.getExternalStorageDirectory().getPath()
-                    .toString() + "/TODO_" + currentDateandTime + ".jpg"
-            Toast.makeText(this, "$fileName saved", Toast.LENGTH_SHORT).show()
-            Imgcodecs.imwrite(fileName, mRgba)
+            val fileName: String =  "Image_" + currentDateandTime + ".jpg"
+            utilities.saveMatAsImageToDevice(this, fileName, mRgba)
         }
     }
 
@@ -122,13 +123,8 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     }
 
     override fun onCameraFrame(inputFrame: CvCameraViewFrame): Mat? {
-        mRgba = inputFrame.gray(); //.rgba()
-        val im = Mat()
-        // https://stackoverflow.com/questions/22240220/thresholding-image-in-opencv-for-a-range-of-max-and-min-values
-        Imgproc.threshold(mRgba, im, 100.0, 150.0, Imgproc.THRESH_BINARY);
-
-
-        return im
+        mRgba = inputFrame.rgba() //.gray();
+        return mRgba
     }
 
     companion object {
