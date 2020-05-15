@@ -15,7 +15,8 @@ class WebsiteComunicator {
         return webView
     }
 
-    fun run(webView: WebView, scriptSrc: String) {
+    fun run(webView: WebView, number: String) {
+        val scriptSrc = "ax('$number');"
         webView.post(Runnable {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 webView.evaluateJavascript(scriptSrc, null)

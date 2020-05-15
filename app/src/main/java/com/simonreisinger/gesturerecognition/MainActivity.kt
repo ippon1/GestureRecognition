@@ -77,7 +77,7 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
 
             utilities.MatToImgView(imgMat, findViewById<ImageView>(R.id.imgView))
             if (webView != null) {
-                websiteComunicator.run(webView!!, "ax('010111');")
+                websiteComunicator.run(webView!!, "101")
             }
             val sdf = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
             val currentDateandTime: String = sdf.format(Date())
