@@ -2,24 +2,25 @@ package com.simonreisinger.gesturerecognition
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.*
 import android.view.View.OnTouchListener
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.Toast
-import org.opencv.android.*
+import org.opencv.android.BaseLoaderCallback
+import org.opencv.android.CameraBridgeViewBase
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2
-import org.opencv.core.*
-import org.opencv.imgcodecs.Imgcodecs
-import org.opencv.imgcodecs.Imgcodecs.IMREAD_COLOR
-import org.opencv.imgcodecs.Imgcodecs.imread
-import org.opencv.imgproc.Imgproc
+import org.opencv.android.LoaderCallbackInterface
+import org.opencv.android.OpenCVLoader
+import org.opencv.core.CvType
+import org.opencv.core.Mat
+import org.opencv.core.Scalar
+import org.opencv.core.Size
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,6 +28,8 @@ import java.util.*
 open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     private var utilities: Utilities = Utilities()
     private var findHand: FindHand = FindHand()
+    private var websiteComunicator: WebsiteComunicator = WebsiteComunicator()
+    private var webView: WebView? = null
     private var mIsColorSelected = false
     private var mRgba: Mat? = null
     private var mBlobColorRgba: Scalar? = null
@@ -58,6 +61,10 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_main)
+
+        webView = websiteComunicator.initWebView(findViewById<WebView>(R.id.Web_View))
+
+
         mOpenCvCameraView =
             findViewById(R.id.color_blob_detection_activity_surface_view) as CameraBridgeViewBase?
         mOpenCvCameraView!!.visibility = SurfaceView.VISIBLE
@@ -134,4 +141,6 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     init {
         Log.i(TAG, "Instantiated new " + this.javaClass)
     }
+
+
 }

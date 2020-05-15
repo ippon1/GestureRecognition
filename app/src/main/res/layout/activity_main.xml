@@ -22,5 +22,11 @@
         android:layout_alignParentEnd="true"
         android:contentDescription="@string/imgview" />
 
+    <WebView
+        android:id="@+id/Web_View"
+        android:layout_width="142dp"
+        android:layout_height="154dp"
+        android:layout_alignParentBottom="true" />
+
 
 </RelativeLayout>
