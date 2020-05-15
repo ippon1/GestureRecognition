@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.*
 import android.view.View.OnTouchListener
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.ImageView
 import org.opencv.android.BaseLoaderCallback
@@ -77,7 +76,9 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
             val imgMat = utilities.openingImages("/sdcard/DCIM/depth.png")
 
             utilities.MatToImgView(imgMat, findViewById<ImageView>(R.id.imgView))
-
+            if (webView != null) {
+                websiteComunicator.run(webView!!, "ax('010111');")
+            }
             val sdf = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
             val currentDateandTime: String = sdf.format(Date())
             val fileName: String =  "Image_" + currentDateandTime + ".jpg"
@@ -142,5 +143,13 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
         Log.i(TAG, "Instantiated new " + this.javaClass)
     }
 
+    @Override
+    override fun onBackPressed() {
+        if (webView!!.canGoBack()) {
+            webView!!.goBack()
+        } else {
+            super.onBackPressed()
+        }
+    }
 
 }

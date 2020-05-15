@@ -1,5 +1,6 @@
 package com.simonreisinger.gesturerecognition
 
+import android.os.Build
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
@@ -12,5 +13,15 @@ class WebsiteComunicator {
             //webView.loadUrl("https://ippon1.github.io/travellog/")
         }
         return webView
+    }
+
+    fun run(webView: WebView, scriptSrc: String) {
+        webView.post(Runnable {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                webView.evaluateJavascript(scriptSrc, null)
+            } else {
+                webView.loadUrl("javascript:$scriptSrc")
+            }
+        })
     }
 }
