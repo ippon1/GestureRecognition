@@ -5,6 +5,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 
 class WebsiteComunicator {
+    
     fun initWebView(webView: WebView?): WebView? {
         if (webView != null) {
             webView.webViewClient = WebViewClient()

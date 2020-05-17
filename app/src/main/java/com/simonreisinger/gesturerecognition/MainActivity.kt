@@ -4,12 +4,16 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import android.view.View.OnTouchListener
 import android.webkit.WebView
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
+import kotlinx.android.synthetic.main.activity_main.*
 import org.opencv.android.BaseLoaderCallback
 import org.opencv.android.CameraBridgeViewBase
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame
@@ -29,6 +33,8 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     private var findHand: FindHand = FindHand()
     private var websiteComunicator: WebsiteComunicator = WebsiteComunicator()
     private var webView: WebView? = null
+    private var lowerThreshold: EditText? = null
+    private var upperThreshold: EditText? = null
     private var mIsColorSelected = false
     private var mRgba: Mat? = null
     private var mBlobColorRgba: Scalar? = null
@@ -63,26 +69,36 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
 
         webView = websiteComunicator.initWebView(findViewById<WebView>(R.id.Web_View))
 
-
         mOpenCvCameraView =
             findViewById(R.id.color_blob_detection_activity_surface_view) as CameraBridgeViewBase?
         mOpenCvCameraView!!.visibility = SurfaceView.VISIBLE
         mOpenCvCameraView!!.setCvCameraViewListener(this)
+        lowerThreshold = findViewById<EditText>(R.id.lowerThreshold)
+        lowerThreshold!!.setText("100.0")
+        upperThreshold = findViewById<EditText>(R.id.upperThreshold)
+        upperThreshold!!.setText("120.0")
 
         val buttonClick: Button = findViewById<Button>(R.id.playButton)
         buttonClick.setOnClickListener {
             buttonClick.setBackgroundColor(Color.BLUE)
 
             val imgMat = utilities.openingImages("/sdcard/DCIM/depth.png")
-
-            utilities.MatToImgView(imgMat, findViewById<ImageView>(R.id.imgView))
-            if (webView != null) {
-                websiteComunicator.run(webView!!, "101")
-            }
+            val lT = lowerThreshold!!.getText().toString().toFloat()
+            val uT = upperThreshold!!.getText().toString().toFloat()
+            utilities.MatToImgView(
+                findHand.identifyContour(imgMat, lT.toDouble(), uT.toDouble()),
+                //utilities.iterateOverPixels(imgMat, lT, uT),
+                findViewById<ImageView>(R.id.imgView)
+            )
             val sdf = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
             val currentDateandTime: String = sdf.format(Date())
-            val fileName: String =  "Image_" + currentDateandTime + ".jpg"
-            utilities.saveMatAsImageToDevice(this, fileName, mRgba)
+            val fileName: String = "Image_$currentDateandTime.jpg"
+
+            //utilities.saveMatAsImageToDevice(this, fileName, mRgba)
+
+            if (false && webView != null) {
+                websiteComunicator.run(webView!!, "101")
+            }
         }
     }
 
