@@ -11,6 +11,7 @@ import org.opencv.imgproc.Imgproc
 
 
 // Source: https://medium.com/@muehler.v/simple-hand-gesture-recognition-using-opencv-and-javascript-eb3d6ced28a0
+// https://github.com/justadudewhohacks/opencv-express
 class FindHand {
 
     // https://stackoverflow.com/questions/28570088/opencv-java-inrange-function
@@ -27,15 +28,12 @@ class FindHand {
 
         // remove noise
         val blurred = Mat()
-        Imgproc.GaussianBlur(rangeMask, blurred, Size(10.0, 10.0), 2);
+        Imgproc.GaussianBlur(rangeMask, blurred, Size(10.0, 10.0), 2.0);
+        // Imgproc.threshold(imMa, im, 100.0, 150.0, Imgproc.THRESH_BINARY);
 
-        return dst
+        return blurred
     }
 
-
-    fun selectDepth() {
-
-    }
 
     fun getHandContour() {
 
