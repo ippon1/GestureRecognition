@@ -10,14 +10,15 @@ import org.opencv.imgproc.Imgproc
 // Source: https://medium.com/@muehler.v/simple-hand-gesture-recognition-using-opencv-and-javascript-eb3d6ced28a0
 // https://github.com/justadudewhohacks/opencv-express
 class FindHand {
+    var matToView: Mat? = null
 
     // https://stackoverflow.com/questions/28570088/opencv-java-inrange-function
     fun identifyContour(imMa: Mat?, lowerThreshold: Double, higherThreshold: Double): Mat {
 
         // filter by closeness to camera
         val rangeMask = Mat()
-        val lowerThresholdTEST = 50.0
-        val higherThresholdTEST = 205.0
+        val lowerThresholdTEST = lowerThreshold //
+        val higherThresholdTEST = higherThreshold //
         Core.inRange(
             imMa,
             Scalar(lowerThresholdTEST, lowerThresholdTEST, lowerThresholdTEST),
@@ -28,6 +29,7 @@ class FindHand {
         // remove noise
         val blurred = Mat()
         Imgproc.GaussianBlur(rangeMask, blurred, Size(1.0, 1.0), 1.0);
+        matToView = blurred
         return blurred
         //val thresholded = Mat()
         //Imgproc.threshold(blurred, thresholded, 100.0, 150.0, Imgproc.THRESH_BINARY);
@@ -35,7 +37,7 @@ class FindHand {
     }
 
     // Source: https://answers.opencv.org/question/103377/android-findcontours-returning-too-many-contours/
-    fun getHandContour(src: Mat?): MatOfPoint {
+    fun getHandContour(src: Mat?): /*Mat*/ MatOfPoint {
         if (src == null) {
             print("Source image is null")
             return MatOfPoint()
@@ -45,46 +47,69 @@ class FindHand {
         Imgproc.findContours(
             src, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE
         )
+        val selectedContour = 5; // TODO make this dynamic and include // find biggest hull
 
-        val contourImg = Mat(src.size(), src.type())
-        val biggestContour = 5; // TODO make this dynamic and include // find biggest hull
-        //for (i in contours.indices) {
-        Imgproc.drawContours(contourImg, contours, biggestContour, Scalar(255.0, 255.0, 255.0), -1)
-        //}
+        if (false) {
+            drawHandContour(contours, hierarchy, Mat(src.size(), src.type()))
+        } else {
+            matToView = Mat(src.size(), src.type())
+            Imgproc.drawContours(
+                matToView,
+                contours,
+                selectedContour,
+                Scalar(255.0, 255.0, 255.0),
+                1,
+                Imgproc.LINE_8,
+                hierarchy,
+                100
+            )
+        }
+        //drawHandContour(contours, hierarchy, matToView!!)
 
-        //return contourImg
-        return contours[biggestContour]
+        return contours[selectedContour] // WORKS CHECKED
+    }
+
+    fun drawHandContour(contours: List<MatOfPoint>, hierarchy: Mat, contourImg: Mat) {
+        for (i in contours.indices) {
+            val color = Scalar(255.0, 255.0, 255.0)
+            Imgproc.drawContours(contourImg, contours, i, color, 1, Imgproc.LINE_8, hierarchy, 100)
+        }
+        matToView = contourImg
+
     }
 
     // https://stackoverflow.com/questions/29316117/draw-convex-hull-on-android
     // TODO edit so it accepcts multiple
-    fun getRoughHull(originalImage: Mat, contour: MatOfPoint): Mat {
+    fun getRoughHull(contour: MatOfPoint): MutableList<Point> { /*originalImage: Mat, */
         val maxDist = 25
         val hulls: MutableList<MatOfInt> = ArrayList()
         val defects: MutableList<MatOfInt4> = ArrayList()
         hulls.add(MatOfInt())
         defects.add(MatOfInt4())
-        Imgproc.convexHull(contour, hulls[0]);
+        Imgproc.convexHull(contour, hulls[0], false)
         Imgproc.convexityDefects(contour, hulls[0], defects[0])
 
-        val defectSP = Point()
-        val defectEP = Point()
-        val defectFP = Point()
+        val oImage = matToView // Mat(originalImage.size(), 16) //
+        val data: Array<Point> = contour.toArray()
 
-        for (j in 0 until defects[0].rows()) {
+        val points: MutableList<Point> = ArrayList()
+        var j = 0
+        while (j < defects[0].rows()) {
             val currentDefect = defects[0]
-            val xxxx = defects[0][j, 0]
-            val startId = defects[0][j, 0][0]
-            val endId = defects[0][j, 0][1]
-            val farId = defects[0][j, 0][2]
-            defectSP.x = startId
-            defectSP.y = startId
-            defectEP.x = endId
-            defectEP.y = endId
-            defectFP.x = farId
-            defectFP.y = farId
+            var xxxx0 = defects[0][j, 0]
+            var xxxx1 = defects[0][j, 1]
+            var xxxx2 = defects[0][j, 2]
+
+
+            val defectSP = data[defects[0][j, 0][0].toInt()]
+            points.add(defectSP)
+            val defectEP = data[defects[0][j + 1, 0][0].toInt()]
+            points.add(defectEP)
+            val defectFP = data[defects[0][j + 2, 0][0].toInt()]
+            points.add(defectFP)
+
             Imgproc.line(
-                originalImage,
+                oImage,
                 defectSP,
                 defectEP,
                 Scalar(255.0, 255.0, 0.0),
@@ -92,16 +117,16 @@ class FindHand {
                 Imgproc.LINE_AA,
                 0
             )
-            Imgproc.circle(originalImage, defectSP, 3, Scalar(255.0, 255.0, 0.0), -1)
-            Imgproc.circle(originalImage, defectEP, 3, Scalar(255.0, 0.0, 255.0), -1)
-            Imgproc.circle(originalImage, defectFP, 3, Scalar(0.0, 255.0, 255.0), -1)
+            Imgproc.circle(oImage, defectSP, 3, Scalar(255.0, 0.0, 0.0), -1)
+            Imgproc.circle(oImage, defectEP, 3, Scalar(0.0, 255.0, 0.0), -1)
+            Imgproc.circle(oImage, defectFP, 3, Scalar(0.0, 0.0, 255.0), -1)
+
+            j += 4
         }
-        return originalImage
+
+        return points
     }
 
-    fun DrawHandContour() {
-
-    }
 
     fun thresholdAdaption(lowerThreshold: EditText?, upperThreshold: EditText?) {
 

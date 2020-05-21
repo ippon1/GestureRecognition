@@ -20,17 +20,14 @@ import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2
 import org.opencv.android.LoaderCallbackInterface
 import org.opencv.android.OpenCVLoader
-import org.opencv.core.CvType
-import org.opencv.core.Mat
-import org.opencv.core.Scalar
-import org.opencv.core.Size
+import org.opencv.core.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
     private var utilities: Utilities = Utilities()
-    private var findHand: FindHand = FindHand()
+    private var findHand: FindHand? = null
     private var websiteComunicator: WebsiteComunicator = WebsiteComunicator()
     private var webView: WebView? = null
     private var lowerThreshold: EditText? = null
@@ -74,39 +71,44 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
         mOpenCvCameraView!!.visibility = SurfaceView.VISIBLE
         mOpenCvCameraView!!.setCvCameraViewListener(this)
         lowerThreshold = findViewById<EditText>(R.id.lowerThreshold)
-        lowerThreshold!!.setText("100.0")
+        lowerThreshold!!.setText("150.0")
         upperThreshold = findViewById<EditText>(R.id.upperThreshold)
-        upperThreshold!!.setText("120.0")
+        upperThreshold!!.setText("205.0")
 
         val buttonClick: Button = findViewById<Button>(R.id.playButton)
         buttonClick.setOnClickListener {
             buttonClick.setBackgroundColor(Color.BLUE)
+            findHand = FindHand()
 
             val imgMat = utilities.openingImages("/sdcard/DCIM/depth.png")
             val lT = lowerThreshold!!.getText().toString().toFloat()
             val uT = upperThreshold!!.getText().toString().toFloat()
             //val imgMatProcessed = imgMat, // works
             //val imgMatProcessed = findHand.identifyContour(imgMat, lT.toDouble(), uT.toDouble()), // works
-            val imgMatProcessed = findHand.identifyContour(
+            val imgMatProcessed = findHand!!.identifyContour(
                 imgMat,
                 lT.toDouble(),
                 uT.toDouble()
             )
-            val biggestContour = findHand.getHandContour(imgMatProcessed)
-            val imgXXX = findHand.getRoughHull(imgMatProcessed, biggestContour);
-            utilities.MatToImgView(
-                imgXXX,
-                //utilities.iterateOverPixels(imgMat, lT, uT),
-                findViewById<ImageView>(R.id.imgView)
-            )
-            val sdf = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
-            val currentDateandTime: String = sdf.format(Date())
-            val fileName: String = "Image_$currentDateandTime.jpg"
+            val biggestContour = findHand!!.getHandContour(imgMatProcessed)
+            if (imgMat != null && biggestContour != null && biggestContour != MatOfPoint()) {
+                findHand!!.getRoughHull(biggestContour);
+                utilities.MatToImgView(
+                    findHand!!.matToView!!,
+                    //utilities.iterateOverPixels(imgMat, lT, uT),
+                    findViewById<ImageView>(R.id.imgView)
+                )
+                val sdf = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
+                val currentDateandTime: String = sdf.format(Date())
+                val fileName: String = "Image_$currentDateandTime.jpg"
 
-            //utilities.saveMatAsImageToDevice(this, fileName, mRgba)
+                //utilities.saveMatAsImageToDevice(this, fileName, mRgba)
 
-            if (false && webView != null) {
-                websiteComunicator.run(webView!!, "101")
+                if (false && webView != null) {
+                    websiteComunicator.run(webView!!, "101")
+                }
+            } else {
+                Log.ERROR
             }
         }
     }
