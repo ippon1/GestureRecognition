@@ -93,7 +93,7 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
                 uT.toDouble()
             )
             val biggestContour = findHand.getHandContour(imgMatProcessed)
-            val imgXXX = findHand.getRoughHull(imgMat, biggestContour);
+            val imgXXX = findHand.getRoughHull(imgMatProcessed, biggestContour);
             utilities.MatToImgView(
                 imgXXX,
                 //utilities.iterateOverPixels(imgMat, lT, uT),

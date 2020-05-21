@@ -31,7 +31,6 @@ class FindHand {
         return blurred
         //val thresholded = Mat()
         //Imgproc.threshold(blurred, thresholded, 100.0, 150.0, Imgproc.THRESH_BINARY);
-
         //return thresholded
     }
 
