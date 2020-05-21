@@ -85,8 +85,17 @@ open class MainActivity : Activity(), OnTouchListener, CvCameraViewListener2 {
             val imgMat = utilities.openingImages("/sdcard/DCIM/depth.png")
             val lT = lowerThreshold!!.getText().toString().toFloat()
             val uT = upperThreshold!!.getText().toString().toFloat()
+            //val imgMatProcessed = imgMat, // works
+            //val imgMatProcessed = findHand.identifyContour(imgMat, lT.toDouble(), uT.toDouble()), // works
+            val imgMatProcessed = findHand.identifyContour(
+                imgMat,
+                lT.toDouble(),
+                uT.toDouble()
+            )
+            val biggestContour = findHand.getHandContour(imgMatProcessed)
+            val imgXXX = findHand.getRoughHull(imgMat, biggestContour);
             utilities.MatToImgView(
-                findHand.identifyContour(imgMat, lT.toDouble(), uT.toDouble()),
+                imgXXX,
                 //utilities.iterateOverPixels(imgMat, lT, uT),
                 findViewById<ImageView>(R.id.imgView)
             )
