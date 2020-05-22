@@ -29,7 +29,7 @@ class FindHand {
         // remove noise
         val blurred = Mat()
         Imgproc.GaussianBlur(rangeMask, blurred, Size(1.0, 1.0), 1.0);
-        matToView = blurred
+        matToView = imMa//blurred
         return blurred
         //val thresholded = Mat()
         //Imgproc.threshold(blurred, thresholded, 100.0, 150.0, Imgproc.THRESH_BINARY);
@@ -46,7 +46,7 @@ class FindHand {
         val contours: List<MatOfPoint> = ArrayList()
         val hierarchy = Mat()
         Imgproc.findContours(
-            src, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_TC89_KCOS
+            src, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE
         )
         val selectedContour = 5; // TODO make this dynamic and include // find biggest hull
 
@@ -59,7 +59,7 @@ class FindHand {
                 contours,
                 selectedContour,
                 Scalar(255.0, 255.0, 255.0),
-                1,
+                5,
                 Imgproc.LINE_8,
                 hierarchy,
                 100
@@ -75,7 +75,7 @@ class FindHand {
             val color = Scalar(255.0, 255.0, 255.0)
             Imgproc.drawContours(contourImg, contours, i, color, 1, Imgproc.LINE_8, hierarchy, 100)
         }
-        matToView = contourImg
+        //matToView = contourImg
 
     }
 
@@ -108,7 +108,10 @@ class FindHand {
             points.add(defectEP)
             val defectFP = data[defects[0][j + 2, 0][0].toInt()]
             points.add(defectFP)
+            val defecDepth = data[defects[0][j + 3, 0][0].toInt()]
+            points.add(defecDepth)
 
+            Imgproc.circle(oImage, defectSP, 3, Scalar(255.0, 0.0, 0.0), -1)
             Imgproc.line(
                 oImage,
                 defectSP,
@@ -118,9 +121,27 @@ class FindHand {
                 Imgproc.LINE_AA,
                 0
             )
-            Imgproc.circle(oImage, defectSP, 3, Scalar(255.0, 0.0, 0.0), -1)
             Imgproc.circle(oImage, defectEP, 3, Scalar(0.0, 255.0, 0.0), -1)
+            Imgproc.line(
+                oImage,
+                defectEP,
+                defectFP,
+                Scalar(255.0, 255.0, 0.0),
+                2,
+                Imgproc.LINE_AA,
+                0
+            )
             Imgproc.circle(oImage, defectFP, 3, Scalar(0.0, 0.0, 255.0), -1)
+            Imgproc.line(
+                oImage,
+                defectEP,
+                defecDepth,
+                Scalar(255.0, 255.0, 0.0),
+                2,
+                Imgproc.LINE_AA,
+                0
+            )
+            Imgproc.circle(oImage, defecDepth, 3, Scalar(255.0, 0.0, 255.0), -1)
 
             j += 4
         }
