@@ -37,6 +37,7 @@ class FindHand {
     }
 
     // Source: https://answers.opencv.org/question/103377/android-findcontours-returning-too-many-contours/
+    // Source: https://docs.opencv.org/3.4/d9/d8b/tutorial_py_contours_hierarchy.html
     fun getHandContour(src: Mat?): /*Mat*/ MatOfPoint {
         if (src == null) {
             print("Source image is null")
@@ -45,11 +46,11 @@ class FindHand {
         val contours: List<MatOfPoint> = ArrayList()
         val hierarchy = Mat()
         Imgproc.findContours(
-            src, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE
+            src, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_TC89_KCOS
         )
         val selectedContour = 5; // TODO make this dynamic and include // find biggest hull
 
-        if (false) {
+        if (true) {
             drawHandContour(contours, hierarchy, Mat(src.size(), src.type()))
         } else {
             matToView = Mat(src.size(), src.type())
