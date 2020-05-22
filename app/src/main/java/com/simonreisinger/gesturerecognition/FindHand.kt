@@ -95,41 +95,12 @@ class FindHand {
 
         val points: MutableList<Point> = ArrayList()
 
-        drawdefectsOnMat1(defects, data, points, oImage)
+        drawdefectsOnMat(defects, data, points, oImage)
 
 
         return points
     }
-
-    fun drawdefectsOnMat1(
-        defects: MutableList<MatOfInt4>,
-        data: Array<Point>,
-        points: MutableList<Point>,
-        oImage: Mat?
-    ) {
-        var startPoint = data[defects[0][0, 0][0].toInt()]
-        var j = 1
-        while (j < (defects[0].rows())) {
-            val endPoint = data[defects[0][j, 0][0].toInt()]
-            points.add(endPoint)
-
-            Imgproc.circle(oImage, startPoint, 3, Scalar(255.0, 0.0, 0.0), -1)
-            Imgproc.line(
-                oImage,
-                startPoint,
-                endPoint,
-                Scalar(255.0, 255.0, 0.0),
-                2,
-                Imgproc.LINE_AA,
-                0
-            )
-
-            startPoint = endPoint
-            j += 1
-        }
-
-    }
-
+    
     fun drawdefectsOnMat(
         defects: MutableList<MatOfInt4>,
         data: Array<Point>,
@@ -140,12 +111,12 @@ class FindHand {
         while (j < defects[0].rows()) {
             val defectSP = data[defects[0][j, 0][0].toInt()]
             points.add(defectSP)
-            val defectEP = data[defects[0][j + 1, 0][0].toInt()]
+            val defectEP = data[defects[0][j, 0][1].toInt()]
             points.add(defectEP)
-            val defectFP = data[defects[0][j + 2, 0][0].toInt()]
+            val defectFP = data[defects[0][j, 0][2].toInt()]
             points.add(defectFP)
-            val defecDepth = data[defects[0][j + 3, 0][0].toInt()]
-            points.add(defecDepth)
+            //val defecDepth = data[defects[0][j, 0][3].toInt()]
+            //points.add(defecDepth)
 
             Imgproc.circle(oImage, defectSP, 3, Scalar(255.0, 0.0, 0.0), -1)
             Imgproc.line(
@@ -168,18 +139,8 @@ class FindHand {
                 0
             )
             Imgproc.circle(oImage, defectFP, 3, Scalar(0.0, 0.0, 255.0), -1)
-            Imgproc.line(
-                oImage,
-                defectEP,
-                defecDepth,
-                Scalar(255.0, 255.0, 0.0),
-                2,
-                Imgproc.LINE_AA,
-                0
-            )
-            Imgproc.circle(oImage, defecDepth, 3, Scalar(255.0, 0.0, 255.0), -1)
 
-            j += 4
+            j += 1
         }
     }
 
