@@ -94,14 +94,50 @@ class FindHand {
         val data: Array<Point> = contour.toArray()
 
         val points: MutableList<Point> = ArrayList()
+
+        drawdefectsOnMat1(defects, data, points, oImage)
+
+
+        return points
+    }
+
+    fun drawdefectsOnMat1(
+        defects: MutableList<MatOfInt4>,
+        data: Array<Point>,
+        points: MutableList<Point>,
+        oImage: Mat?
+    ) {
+        var startPoint = data[defects[0][0, 0][0].toInt()]
+        var j = 1
+        while (j < (defects[0].rows())) {
+            val endPoint = data[defects[0][j, 0][0].toInt()]
+            points.add(endPoint)
+
+            Imgproc.circle(oImage, startPoint, 3, Scalar(255.0, 0.0, 0.0), -1)
+            Imgproc.line(
+                oImage,
+                startPoint,
+                endPoint,
+                Scalar(255.0, 255.0, 0.0),
+                2,
+                Imgproc.LINE_AA,
+                0
+            )
+
+            startPoint = endPoint
+            j += 1
+        }
+
+    }
+
+    fun drawdefectsOnMat(
+        defects: MutableList<MatOfInt4>,
+        data: Array<Point>,
+        points: MutableList<Point>,
+        oImage: Mat?
+    ) {
         var j = 0
         while (j < defects[0].rows()) {
-            val currentDefect = defects[0]
-            var xxxx0 = defects[0][j, 0]
-            var xxxx1 = defects[0][j, 1]
-            var xxxx2 = defects[0][j, 2]
-
-
             val defectSP = data[defects[0][j, 0][0].toInt()]
             points.add(defectSP)
             val defectEP = data[defects[0][j + 1, 0][0].toInt()]
@@ -145,8 +181,6 @@ class FindHand {
 
             j += 4
         }
-
-        return points
     }
 
 
