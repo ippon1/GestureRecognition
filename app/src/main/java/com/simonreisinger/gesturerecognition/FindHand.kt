@@ -5,6 +5,7 @@ import android.text.TextWatcher
 import android.widget.EditText
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
+import java.util.function.BiPredicate
 
 
 // Source: https://medium.com/@muehler.v/simple-hand-gesture-recognition-using-opencv-and-javascript-eb3d6ced28a0
@@ -66,7 +67,6 @@ class FindHand {
             )
         }
         //drawHandContour(contours, hierarchy, matToView!!)
-
         return contours[selectedContour] // WORKS CHECKED
     }
 
@@ -77,6 +77,14 @@ class FindHand {
         }
         //matToView = contourImg
 
+    }
+
+    fun simplifyContour(contour: MatOfPoint, maxDist: Double): MatOfPoint{
+        val labels: MutableList<Int> = java.util.ArrayList()
+        //BiPredicate pre
+        //Partition.partition()
+
+        return MatOfPoint() // TODO change this line
     }
 
     // https://stackoverflow.com/questions/29316117/draw-convex-hull-on-android
@@ -98,9 +106,11 @@ class FindHand {
         drawdefectsOnMat(defects, data, points, oImage)
 
 
+
+
         return points
     }
-    
+
     fun drawdefectsOnMat(
         defects: MutableList<MatOfInt4>,
         data: Array<Point>,
@@ -109,41 +119,41 @@ class FindHand {
     ) {
         var j = 0
         while (j < defects[0].rows()) {
-            val defectSP = data[defects[0][j, 0][0].toInt()]
-            points.add(defectSP)
-            val defectEP = data[defects[0][j, 0][1].toInt()]
-            points.add(defectEP)
-            val defectFP = data[defects[0][j, 0][2].toInt()]
-            points.add(defectFP)
-            //val defecDepth = data[defects[0][j, 0][3].toInt()]
-            //points.add(defecDepth)
+            val fixptDepth = defects[0][j, 0][3]
+            if (fixptDepth > 0.0) {
+                val defectSP = data[defects[0][j, 0][0].toInt()]
+                points.add(defectSP)
+                val defectEP = data[defects[0][j, 0][1].toInt()]
+                points.add(defectEP)
+                val defectFP = data[defects[0][j, 0][2].toInt()]
+                points.add(defectFP)
 
-            Imgproc.circle(oImage, defectSP, 3, Scalar(255.0, 0.0, 0.0), -1)
-            Imgproc.line(
-                oImage,
-                defectSP,
-                defectEP,
-                Scalar(255.0, 255.0, 0.0),
-                2,
-                Imgproc.LINE_AA,
-                0
-            )
-            Imgproc.circle(oImage, defectEP, 3, Scalar(0.0, 255.0, 0.0), -1)
-            Imgproc.line(
-                oImage,
-                defectEP,
-                defectFP,
-                Scalar(255.0, 255.0, 0.0),
-                2,
-                Imgproc.LINE_AA,
-                0
-            )
-            Imgproc.circle(oImage, defectFP, 3, Scalar(0.0, 0.0, 255.0), -1)
+                Imgproc.circle(oImage, defectSP, 3, Scalar(255.0, 0.0, 0.0), -1)
+                Imgproc.line(
+                    oImage,
+                    defectSP,
+                    defectEP,
+                    Scalar(255.0, 255.0, 0.0),
+                    2,
+                    Imgproc.LINE_AA,
+                    0
+                )
+                Imgproc.circle(oImage, defectEP, 3, Scalar(0.0, 255.0, 0.0), -1)
+                Imgproc.line(
+                    oImage,
+                    defectEP,
+                    defectFP,
+                    Scalar(255.0, 255.0, 0.0),
+                    2,
+                    Imgproc.LINE_AA,
+                    0
+                )
+                Imgproc.circle(oImage, defectFP, 3, Scalar(0.0, 0.0, 255.0), -1)
 
+            }
             j += 1
         }
     }
-
 
     fun thresholdAdaption(lowerThreshold: EditText?, upperThreshold: EditText?) {
 
