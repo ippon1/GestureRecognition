@@ -6,6 +6,7 @@ import android.widget.EditText
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
 import java.util.function.BiPredicate
+import kotlin.math.sqrt
 
 
 // Source: https://medium.com/@muehler.v/simple-hand-gesture-recognition-using-opencv-and-javascript-eb3d6ced28a0
@@ -79,23 +80,16 @@ class FindHand {
 
     }
 
-    fun simplifyContour(contour: MatOfPoint, maxDist: Double): MatOfPoint{
-        val labels: MutableList<Int> = java.util.ArrayList()
-        //BiPredicate pre
-        //Partition.partition()
-
-        return MatOfPoint() // TODO change this line
-    }
-
     // https://stackoverflow.com/questions/29316117/draw-convex-hull-on-android
     // TODO edit so it accepcts multiple
     fun getRoughHull(contour: MatOfPoint): MutableList<Point> { /*originalImage: Mat, */
-        val maxDist = 25
+        val maxDist = 25.0
         val hulls: MutableList<MatOfInt> = ArrayList()
         val defects: MutableList<MatOfInt4> = ArrayList()
         hulls.add(MatOfInt())
         defects.add(MatOfInt4())
         Imgproc.convexHull(contour, hulls[0], false)
+        hulls[0] = simplifyHull(contour, hulls[0], maxDist)
         Imgproc.convexityDefects(contour, hulls[0], defects[0])
 
         val oImage = matToView // Mat(originalImage.size(), 16) //
@@ -105,10 +99,60 @@ class FindHand {
 
         drawdefectsOnMat(defects, data, points, oImage)
 
-
-
-
         return points
+    }
+
+    // TODO maybe remove the sqrt to make it mor efficient
+    private fun ptDist(pt1: Point, pt2: Point): Double {
+        val xDiff: Double = pt1.x - pt2.x
+        val yDiff: Double = pt1.y - pt2.y
+        val distanceBtwPoints = sqrt((xDiff * xDiff) + (yDiff * yDiff));
+        return distanceBtwPoints
+    }
+
+    private fun getCenterPt(pts: ArrayList<Point>){
+
+    }
+
+    private fun simplifyHull(contour: MatOfPoint, hull: MatOfInt, maxDist: Double): MatOfInt {
+
+        val hullPoints: MutableList<Point> = java.util.ArrayList()
+        val data: Array<Point> = contour.toArray()
+        for (item in hull.toList()) {
+            hullPoints.add(data[item])
+        }
+
+        // group all points in local neighborhood
+        val labels: MutableList<Int> = java.util.ArrayList()
+
+        // Simple predicate for checking equality
+        val predicate =
+            label@ BiPredicate { pt1: Point, pt2: Point ->
+                if (ptDist(pt1, pt2) >= maxDist) return@label true
+                false
+            }
+
+        Partition.partition(hullPoints, labels, predicate)
+
+        val pointsByLabel: Map<Int, Point> = labels.zip(hullPoints).toMap()
+
+        // map points in local neighborhood to most central point
+
+
+        // const pointGroups = Array.from(pointsByLabel.values());
+        //var pointGroups
+        val pointGroup = Point()
+        var getMostCentralPoint = (pointGroup.) ->
+
+        var pointGroups = pointsByLabel.values.toTypedArray()
+        pointGroups.map { pointGroup.x }
+
+
+        val peopleToAge = mapOf("Alice" to 20, "Bob" to 21)
+        println(peopleToAge.map { (name, age) -> "$name is $age years old" }) // [Alice is 20 years old, Bob is 21 years old]
+        println(peopleToAge.map { it.value }) // [20, 21]
+
+        return MatOfInt() // TODO change this line
     }
 
     fun drawdefectsOnMat(
